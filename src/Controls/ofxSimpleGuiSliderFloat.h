@@ -11,4 +11,8 @@ public:
 	ofxSimpleGuiSliderFloat(string name, float &value, float min, float max) : ofxSimpleGuiSliderBase<float>(name, value, min, max) {
 		controlType = "SliderFloat";
 	}
+    
+    void onKeyBackspace() {
+        setValue(0.f);
+    }
 };
