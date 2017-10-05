@@ -232,6 +232,7 @@ void ofxSimpleGuiPage::keyPressed(ofKeyEventArgs &e) {
 	bool keyLeft	= e.key == OF_KEY_LEFT;
 	bool keyRight	= e.key == OF_KEY_RIGHT;
 	bool keyEnter	= e.key == OF_KEY_RETURN;
+    bool keyBackspace = e.key == OF_KEY_BACKSPACE;
 	
 	for(int i=0; i<controls.size(); i++) {
 		ofxSimpleGuiControl *c = controls[i];
@@ -241,6 +242,7 @@ void ofxSimpleGuiPage::keyPressed(ofKeyEventArgs &e) {
 			if(keyLeft)		c->onKeyLeft();
 			if(keyRight)	c->onKeyRight();
 			if(keyEnter)	c->onKeyEnter();
+            if(keyBackspace) c->onKeyBackspace();
 			c->_keyPressed(e);
 		}
 	}

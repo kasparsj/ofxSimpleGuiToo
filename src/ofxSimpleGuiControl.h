@@ -46,6 +46,7 @@ public:
 	virtual void onKeyLeft() {}			// left key is pressed
 	virtual void onKeyRight() {}		// right key is pressed
 	virtual void onKeyEnter() {}		// enter key is pressed
+    virtual void onKeyBackspace() {}    // backspace key is pressed
 	
 	
 	// from ofxMSAInteractiveObject
