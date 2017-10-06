@@ -54,8 +54,8 @@ public:
 	void						setup();
 	
 	
-	void						loadFromXML();
-	void						saveToXML();	
+	void						loadFromXML(string path = "");
+	void						saveToXML(string path = "");
 	void						setAutoSave(bool b);
 	void						setAlignRight(bool b);
 	void						setDefaultKeys(bool b);
@@ -116,6 +116,8 @@ protected:
 	bool							alignRight;
 	bool							doDefaultKeys;
 	bool							doSave;//, doSaveBackup;
+    bool                            savePreset;
+    bool                            loadPreset;
 	bool							changePage;
 	int								forceHeight;
 	
