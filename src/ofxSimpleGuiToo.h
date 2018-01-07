@@ -108,8 +108,6 @@ public:
 	
 	
 	void						draw();
-    
-    int                                currentPageIndex;            // 1 based index of page (0 is for global controls)
 	
 protected:
 	bool							doAutoSave;
@@ -120,6 +118,7 @@ protected:
     bool                            loadPreset;
 	bool							changePage;
 	int								forceHeight;
+    int                             currentPageIndex;            // 1 based index of page (0 is for global controls)
 	
 	bool							doDraw;
 	float							border;
