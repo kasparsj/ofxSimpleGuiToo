@@ -103,8 +103,11 @@ public:
 	ofxSimpleGuiTitle			&addTitle(string name="", float height = 0);
 	ofxSimpleGuiToggle			&addToggle(string name, bool &value);
 	ofxSimpleGuiColorPicker		&addColorPicker(string name, ofFloatColor& color);
-	ofxSimpleGuiComboBox        &addComboBox(string name, int &value, int numChoices, string* choiceTitles=NULL);
-    ofxSimpleGuiComboBox        &addComboBox(string name, int &value, vector<string>& choiceTitles);
+    ofxSimpleGuiComboBox        &addComboBox(string name, int &value, int numChoices, string* choiceTitles=NULL, bool includeBlank=false);
+    ofxSimpleGuiComboBox        &addComboBox(string name, int &value, vector<string>& choiceTitles, bool includeBlank=false);
+    ofxSimpleGuiTextInput       &addTextInput(string name, string &value);
+    ofxSimpleGuiFilePath        &addFilePath(string name, string &value, bool bFolderSelection=false);
+    ofxSimpleGuiFileComboBox    &addFileComboBox(string name, string &value, ofDirectory &dir);
 	
 	
 	void						draw();

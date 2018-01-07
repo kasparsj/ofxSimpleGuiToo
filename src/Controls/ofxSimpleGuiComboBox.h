@@ -18,7 +18,7 @@ public:
 	//create a combo box which displays "Name : selection"
 	//choiceTitles is an array of strings that can be NULL in which case numbers will be used to display the choices
 	//the titles can be movified later with the below documented add/set/removeChoice methods
-	ofxSimpleGuiComboBox(string name, int &choice_out, int numChoices,  ofxSimpleGuiPage *owner, string* choiceTitles = NULL ) ;
+	ofxSimpleGuiComboBox(string name, int &choice_out, int numChoices, ofxSimpleGuiPage *owner, string* choiceTitles = NULL, bool includeBlank = false) ;
 	virtual ~ofxSimpleGuiComboBox();
 	
 	void setup();
@@ -76,6 +76,7 @@ protected:
 	void setCBTextBGColor();
 	void releaseEventStealingFocus();
 	
+    bool           m_includeBlank;
 	int            m_mouseChoice;
 	int            &m_selectedChoice;
 	bool           m_hasFocus;

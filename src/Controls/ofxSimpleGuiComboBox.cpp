@@ -13,18 +13,22 @@
 #define kMaxChoiceStringLen 150
 #define kMaxNameStringLen 100
 
-ofxSimpleGuiComboBox::ofxSimpleGuiComboBox(string name, int &choice_out, int numChoices, ofxSimpleGuiPage *owner, string* choiceTitles ) :
+ofxSimpleGuiComboBox::ofxSimpleGuiComboBox(string name, int &choice_out, int numChoices, ofxSimpleGuiPage *owner, string* choiceTitles, bool includeBlank) :
 ofxSimpleGuiControl(name),
 m_selectedChoice(choice_out),
 m_page(owner)
 {
+    m_includeBlank = includeBlank;
 	m_mouseChoice = 0;
-	if(numChoices <=1)
+	if (numChoices <=1)
 		numChoices = 1;
-	m_hasFocus=false;
+	m_hasFocus = false;
 	m_title = name;
 	
-	for(int i=0; i<numChoices; i++){
+    if (includeBlank) {
+        addChoice("");
+    }
+	for (int i=0; i<numChoices; i++) {
 		addChoice(choiceTitles ? choiceTitles[i] : ofToString(i));
 	}
 	controlType = "ComboBox";
@@ -43,7 +47,7 @@ void ofxSimpleGuiComboBox::setTitleForIndex(int index, string title) {
 }
 
 string ofxSimpleGuiComboBox::getTitleForIndex(int index) {
-	if(index < 0 || index >= m_choices.size())return m_choices.size() ? m_choices[m_selectedChoice] : "No Choices Available";
+	if(index < 0 || index >= m_choices.size()) return m_choices.size() ? m_choices[m_selectedChoice] : "No Choices Available";
 	return m_choices[index];
 }
 
@@ -108,7 +112,7 @@ int ofxSimpleGuiComboBox::getValue() {
 }
 
 void ofxSimpleGuiComboBox::setValue(int index) {
-	m_selectedChoice = ofClamp(index, 0, m_choices.size());
+    m_selectedChoice = ofClamp(index, m_includeBlank ? -1 : 0, m_choices.size());
 }
 
 void ofxSimpleGuiComboBox::setValue(string title) {
@@ -184,7 +188,12 @@ void ofxSimpleGuiComboBox::onRelease(int x, int y, int button) {
 
 void ofxSimpleGuiComboBox::releaseEventStealingFocus(){
 	//see which index was selected, but only if the user actually moved around.
-	m_selectedChoice = m_mouseChoice >= 0? m_mouseChoice : m_selectedChoice;
+    if (m_mouseChoice >= 0) {
+        m_selectedChoice = m_includeBlank ? m_mouseChoice - 1 : m_mouseChoice;
+    }
+    else {
+        m_selectedChoice = m_selectedChoice;
+    }
 	
 	//a release toggles focus state if we are on - TODO: unless x and y don't change
 	m_hasFocus = false;
@@ -224,9 +233,8 @@ void ofxSimpleGuiComboBox::draw(float x, float y) {
 	ofDrawRectangle(0, 0, width, height);
 	
 	setTextColor();
-//	sprintf(choiceBuf, "%s: %s", m_title, m_choices.size() ? m_choices[m_selectedChoice] : "(No Choices Available)");
 	
-	ofDrawBitmapString(m_title + "\n" + (m_choices.size() ? m_choices[m_selectedChoice] : "N/A"), kSGCBTextPaddingX, kSGCBTextPaddingY);
+    ofDrawBitmapString(m_title + "\n" + (m_choices.size() ? m_choices[m_includeBlank ? m_selectedChoice + 1 : m_selectedChoice] : "N/A"), kSGCBTextPaddingX, kSGCBTextPaddingY);
 	//draw a combobox down triangle icon so the users know to click
 	ofDrawTriangle(width - (kSGCBTriangleWidth + KSGCBTrianglePadding), kSGCBTextPaddingY/2,
 			   width - (KSGCBTrianglePadding), kSGCBTextPaddingY/2,

@@ -26,7 +26,10 @@ public:
 	ofxSimpleGuiTitle			&addTitle(string name="", float height = 0);
 	ofxSimpleGuiToggle			&addToggle(string name, bool &value);
 	ofxSimpleGuiColorPicker		&addColorPicker(string name, ofFloatColor& color);
-	ofxSimpleGuiComboBox		&addComboBox(string name, int &choice_out, int numChoices, string* choiceTitles=NULL);
+	ofxSimpleGuiComboBox		&addComboBox(string name, int &choice_out, int numChoices, string* choiceTitles=NULL, bool includeBlank=false);
+    ofxSimpleGuiTextInput       &addTextInput(string name, string &value);
+    ofxSimpleGuiFilePath        &addFilePath(string name, string &value, bool bFolderSelection=false);
+    ofxSimpleGuiFileComboBox    &addFileComboBox(string name, string &value, ofDirectory &dir);
 	
 	void SetEventStealingControl(ofxSimpleGuiControl &control);
 	void ReleaseEventStealingControl();

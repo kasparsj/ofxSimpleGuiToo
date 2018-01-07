@@ -314,13 +314,28 @@ ofxSimpleGuiColorPicker &ofxSimpleGuiToo::addColorPicker(string name, ofFloatCol
 }
 
 
-ofxSimpleGuiComboBox &ofxSimpleGuiToo::addComboBox(string name, int &value, int numChoices, string* choiceTitles)  {
+ofxSimpleGuiComboBox &ofxSimpleGuiToo::addComboBox(string name, int &value, int numChoices, string* choiceTitles, bool includeBlank)  {
 	if(!config) setup();
-	return pages[currentPageIndex]->addComboBox(name, value, numChoices, choiceTitles);
+	return pages[currentPageIndex]->addComboBox(name, value, numChoices, choiceTitles, includeBlank);
 }
 
-ofxSimpleGuiComboBox &ofxSimpleGuiToo::addComboBox(string name, int &value, vector<string>& choiceTitles) {
+ofxSimpleGuiComboBox &ofxSimpleGuiToo::addComboBox(string name, int &value, vector<string>& choiceTitles, bool includeBlank) {
     return addComboBox(name, value, choiceTitles.size(), &choiceTitles[0]);
+}
+
+ofxSimpleGuiTextInput &ofxSimpleGuiToo::addTextInput(string name, string &value) {
+    if(!config) setup();
+    return pages[currentPageIndex]->addTextInput(name, value);
+}
+
+ofxSimpleGuiFilePath &ofxSimpleGuiToo::addFilePath(string name, string &value, bool bFolderSelection) {
+    if(!config) setup();
+    return pages[currentPageIndex]->addFilePath(name, value, bFolderSelection);
+}
+
+ofxSimpleGuiFileComboBox &ofxSimpleGuiToo::addFileComboBox(string name, string &value, ofDirectory &dir) {
+    if(!config) setup();
+    return pages[currentPageIndex]->addFileComboBox(name, value, dir);
 }
 
 

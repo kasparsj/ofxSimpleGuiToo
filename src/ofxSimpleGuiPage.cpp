@@ -40,7 +40,7 @@ void ofxSimpleGuiPage::loadFromXML(string xmlFilepath) {
 }
 
 void ofxSimpleGuiPage::saveToXML(string xmlFilepath) {
-	if(controls.size() <= 1 || xmlFilename.compare("") == 0) return;	// if it has no controls (title counts as one control)
+	if(controls.size() <= 0 || xmlFilename.compare("") == 0) return;	// if it has no controls (title counts as one control)
 	
 #ifndef OFXMSAGUI_DONT_USE_XML
 	XML.clear();	// clear cause we are building a new xml file
@@ -181,11 +181,21 @@ ofxSimpleGuiColorPicker &ofxSimpleGuiPage::addColorPicker(string name, ofFloatCo
 }
 
 
-ofxSimpleGuiComboBox &ofxSimpleGuiPage::addComboBox(string name, int &choice_out, int numChoices, string* choiceTitles) {
-	return (ofxSimpleGuiComboBox &)addControl(* new ofxSimpleGuiComboBox(name, choice_out, numChoices, this, choiceTitles));
+ofxSimpleGuiComboBox &ofxSimpleGuiPage::addComboBox(string name, int &choice_out, int numChoices, string* choiceTitles, bool includeBlank) {
+	return (ofxSimpleGuiComboBox &)addControl(* new ofxSimpleGuiComboBox(name, choice_out, numChoices, this, choiceTitles, includeBlank));
 }
 
+ofxSimpleGuiTextInput &ofxSimpleGuiPage::addTextInput(string name, string &value) {
+    return (ofxSimpleGuiTextInput &)addControl(* new ofxSimpleGuiTextInput(name, value));
+}
 
+ofxSimpleGuiFilePath &ofxSimpleGuiPage::addFilePath(string name, string &value, bool bFolderSelection) {
+    return (ofxSimpleGuiFilePath &)addControl(* new ofxSimpleGuiFilePath(name, value, bFolderSelection));
+}
+
+ofxSimpleGuiFileComboBox &ofxSimpleGuiPage::addFileComboBox(string name, string &value, ofDirectory &dir) {
+    return (ofxSimpleGuiFileComboBox &)addControl(* new ofxSimpleGuiFileComboBox(name, value, dir, this));
+}
 
 
 void ofxSimpleGuiPage::update(ofEventArgs &e) {
