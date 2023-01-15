@@ -47,9 +47,10 @@ public:
 	void keyPressed(ofKeyEventArgs &e);
 	void keyReleased(ofKeyEventArgs &e);
 	
-	
+
 	vector <ofxSimpleGuiControl*>&	getControls();
 	
+    void clear() { controls.clear(); }
 	
 protected:
 	vector <ofxSimpleGuiControl*>	controls;
