@@ -83,11 +83,6 @@ void ofxSimpleGuiFileComboBox::setValue(string val) {
 }
 
 
-//press was outside - handle.
-void onPressOutside(int x, int y, int button)    {
-    
-}
-
 void ofxSimpleGuiFileComboBox::onPress(int x, int y, int button) {
     //    beenPressed = true;
     m_mouseMovedSinceClick=false;
