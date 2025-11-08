@@ -7,6 +7,8 @@
 #include "ofxXmlSettings.h"
 #endif
 
+class ofxSimpleGuiPage;  // Forward declaration
+
 class ofxSimpleGuiControl : public ofxMSAInteractiveObject {
 public:
 	string		name;		// Human readable name this is what is displayed on screen (includes keyboard shortcut)
@@ -24,6 +26,8 @@ public:
 	ofxSimpleGuiControl& setKey(string newKey);
 	ofxSimpleGuiControl& setConfig(ofxSimpleGuiConfig *config);
     ofxSimpleGuiControl& setNewColumn(bool b=true);
+    ofxSimpleGuiControl& setPage(ofxSimpleGuiPage* page);  // Set the page this control belongs to
+    ofxSimpleGuiPage* getPage() const { return page; }      // Get the page this control belongs to
 
 	ofxSimpleGuiControl& setTextColor(bool clickable = true);
 	ofxSimpleGuiControl& setTextBGColor(bool clickable = true);
@@ -63,8 +67,12 @@ public:
 	virtual void keyPressed( int key ){}
 	virtual void keyReleased( int key ){}
 	
+	// Notify the gui that this control's value has changed
+	// Should be called by derived classes when their values change
+	void notifyValueChanged();
 
 protected:
 	ofxSimpleGuiConfig	*config;
+	ofxSimpleGuiPage* page = nullptr;  // Page this control belongs to
 };
 

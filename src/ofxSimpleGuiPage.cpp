@@ -131,6 +131,7 @@ void ofxSimpleGuiPage::draw(float x, float y, bool alignRight) {
 
 ofxSimpleGuiControl &ofxSimpleGuiPage::addControl(ofxSimpleGuiControl& control) {
 	controls.push_back(&control);
+	control.setPage(this);  // Set the page for the control
 	width += control.width + config->padding.x;
 	return control;
 }

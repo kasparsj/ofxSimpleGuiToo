@@ -112,7 +112,11 @@ int ofxSimpleGuiComboBox::getValue() {
 }
 
 void ofxSimpleGuiComboBox::setValue(int index) {
+    int oldValue = m_selectedChoice;
     m_selectedChoice = ofClamp(index, m_includeBlank ? -1 : 0, m_choices.size());
+    if(oldValue != m_selectedChoice) {
+        notifyValueChanged();
+    }
 }
 
 void ofxSimpleGuiComboBox::setValue(string title) {
@@ -188,11 +192,17 @@ void ofxSimpleGuiComboBox::onRelease(int x, int y, int button) {
 
 void ofxSimpleGuiComboBox::releaseEventStealingFocus(){
 	//see which index was selected, but only if the user actually moved around.
+    int oldValue = m_selectedChoice;
     if (m_mouseChoice >= 0) {
         m_selectedChoice = m_includeBlank ? m_mouseChoice - 1 : m_mouseChoice;
     }
     else {
         m_selectedChoice = m_selectedChoice;
+    }
+    
+    // Notify if value changed
+    if(oldValue != m_selectedChoice) {
+        notifyValueChanged();
     }
 	
 	//a release toggles focus state if we are on - TODO: unless x and y don't change

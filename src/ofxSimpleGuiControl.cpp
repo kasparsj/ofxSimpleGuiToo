@@ -1,4 +1,6 @@
 #include "ofxSimpleGuiControl.h"
+#include "ofxSimpleGuiToo.h"
+#include "ofxSimpleGuiPage.h"
 
 
 ofxSimpleGuiControl::ofxSimpleGuiControl(string name) {
@@ -28,6 +30,11 @@ ofxSimpleGuiControl &ofxSimpleGuiControl::setConfig(ofxSimpleGuiConfig *config) 
 
 ofxSimpleGuiControl &ofxSimpleGuiControl::setNewColumn(bool b) {
 	newColumn = b;
+	return *this;
+}
+
+ofxSimpleGuiControl &ofxSimpleGuiControl::setPage(ofxSimpleGuiPage* p) {
+	page = p;
 	return *this;
 }
 
@@ -87,5 +94,11 @@ ofxSimpleGuiControl &ofxSimpleGuiControl::setKeyboardShortcut(char c) {
 		name = origName;
 	}
 	return *this;
+}
+
+void ofxSimpleGuiControl::notifyValueChanged() {
+	extern ofxSimpleGuiToo gui;
+	std::string pageName = page ? page->name : "";
+	gui.notifyControlChanged(key, controlType, pageName);
 }
 

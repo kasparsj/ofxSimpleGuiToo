@@ -340,6 +340,26 @@ ofxSimpleGuiFileComboBox &ofxSimpleGuiToo::addFileComboBox(string name, string &
     return pages[currentPageIndex]->addFileComboBox(name, value, dir);
 }
 
+void ofxSimpleGuiToo::notifyControlChanged(const std::string& controlName, const std::string& controlType, const std::string& pageName, void* oldValue, void* newValue) {
+    ofxSimpleGuiControlChangeEvent event;
+    event.controlName = controlName;
+    event.controlType = controlType;
+    event.pageName = pageName;
+    event.oldValue = oldValue;
+    event.newValue = newValue;
+    
+    // Dispatch the event
+    ofNotifyEvent(controlChangedEvent, event, this);
+    
+    // Call registered callback if any
+    if (controlChangeCallback) {
+        controlChangeCallback(controlName, controlType, pageName);
+    }
+}
+
+void ofxSimpleGuiToo::registerControlChangeCallback(std::function<void(const std::string&, const std::string&, const std::string&)> callback) {
+    controlChangeCallback = callback;
+}
 
 //void ofxSimpleGuiToo::setup(ofEventArgs &e) {
 void ofxSimpleGuiToo::update(ofEventArgs &e) {

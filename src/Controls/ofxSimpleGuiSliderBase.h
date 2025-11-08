@@ -150,11 +150,18 @@ public:
 	void update() {
 		if(!enabled) return;
 		
+		Type previousValue = *value;
+		
 		if(oldValue != *value) {					// if value has changed programmatically by something else
 			oldValue = targetValue = *value;			// save the value in target and oldvalue
 		} else {									// otherwise lerp
 			*value += (Type)((targetValue - *value) * lerpSpeed);
 			oldValue = *value;							// and save oldvalue
+		}
+		
+		// Notify if value changed
+		if(previousValue != *value) {
+			notifyValueChanged();
 		}
 		
 		if(lock) {

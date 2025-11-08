@@ -36,12 +36,23 @@
 #pragma once
 
 #include "ofMain.h"
+#include <functional>
+#include <string>
 
 #ifndef OFXMSAGUI_DONT_USE_XML
 #include "ofxXmlSettings.h"
 #endif
 
 #include "ofxSimpleGuiIncludes.h"
+
+// Event data structure for control change events
+struct ofxSimpleGuiControlChangeEvent {
+    std::string controlName;  // The key/name of the control
+    std::string controlType;  // Type of control (e.g., "SliderFloat", "ComboBox", etc.)
+    std::string pageName;     // The name of the page this control belongs to
+    void* oldValue;           // Pointer to old value (type-specific)
+    void* newValue;           // Pointer to new value (type-specific)
+};
 
 class ofxSimpleGuiToo {
 	
@@ -89,6 +100,15 @@ public:
 	
 	ofxSimpleGuiControl			&control(string name);		// returns control by name
 	
+	// Event system for control changes
+	ofEvent<ofxSimpleGuiControlChangeEvent> controlChangedEvent;
+	
+	// Notify that a control has changed (called by controls internally)
+	void notifyControlChanged(const std::string& controlName, const std::string& controlType, const std::string& pageName = "", void* oldValue = nullptr, void* newValue = nullptr);
+	
+	// Register a callback for all control changes
+	// Callback signature: void callback(const std::string& controlName, const std::string& controlType, const std::string& pageName)
+	void registerControlChangeCallback(std::function<void(const std::string&, const std::string&, const std::string&)> callback);
 	
 	ofxSimpleGuiPage			&addPage(string name = "");
 	ofxSimpleGuiControl			&addControl(ofxSimpleGuiControl& control);
@@ -130,6 +150,8 @@ protected:
 	ofxSimpleGuiPage				*headerPage;
 	ofxSimpleGuiButton				*titleButton;
 	vector <ofxSimpleGuiPage*>		pages;				// 0 is for headerPage
+	
+	std::function<void(const std::string&, const std::string&, const std::string&)> controlChangeCallback;
 	
 	void addListeners();
 	void removeListeners();
