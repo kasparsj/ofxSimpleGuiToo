@@ -75,6 +75,7 @@ void ofxSimpleGuiPage::draw(float x, float y, bool alignRight) {
 	float posY		= 0;
 	float stealingX = 0;
 	float stealingY = 0;
+	float pageY 	= 0;
 	
 	ofSetRectMode(OF_RECTMODE_CORNER);
 	
@@ -84,11 +85,26 @@ void ofxSimpleGuiPage::draw(float x, float y, bool alignRight) {
 		if(control.newColumn) {
 			if(alignRight) posX -= config->gridSize.x;
 			else posX += config->gridSize.x;
-			posY = 0;
+			posY = pageY;
 		}
 		
 		float controlX = posX + x;
 		float controlY = posY + y;
+		
+		// Check for horizontal overflow and wrap to new row
+		// Reset to first column (posX = 0) and move to next row (posY)
+		if(controlX + control.width > ofGetWidth()) {
+			posX = 0;
+			posY = getNextY(posY + control.height + config->padding.y);
+			pageY = posY;
+			controlX = posX + x;
+			controlY = posY + y;
+			// Update page height to accommodate the new row
+			float newBottom = controlY + control.height + config->padding.y;
+			if(newBottom > height) {
+				height = newBottom;
+			}
+		}
 		
 		//we don't draw the event stealing controls until the end because they can expand and overlap with other controls (e.g. combo box)
 		if(eventStealingControl == &control) {
@@ -105,12 +121,20 @@ void ofxSimpleGuiPage::draw(float x, float y, bool alignRight) {
 			glLineWidth(0.5f);
 			ofDrawRectangle(controlX, controlY, control.width, control.height);
 		}
+		
+		// Update posY for next control
 		posY = getNextY(posY + control.height + config->padding.y);
+		
+		// Update page height to track the maximum bottom position
+		float currentBottom = controlY + control.height + config->padding.y;
+		if(currentBottom > height) {
+			height = currentBottom;
+		}
 		
 		if(posY + y >= height - control.height - config->padding.y) {
 			if(alignRight) posX -= config->gridSize.x;
 			else posX += config->gridSize.x;
-			posY = 0;
+			posY = pageY;
 		}
 		
 		//		if(guiFocus == controls[i]->guiID) controls[i]->focused = true;		// MEMO
