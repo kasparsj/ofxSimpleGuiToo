@@ -17,6 +17,11 @@ public:
 	Type		targetValue;
 	Type		oldValue;
 	Type		increment;
+	Type		defaultValue; // Default value to restore on double-click
+	
+	// For double-click detection
+	ofPoint		lastPressPlace;
+	float		lastPressTime;
 
 	//--------------------------------------------------------------------- construct
 	ofxSimpleGuiSliderBase(string name, Type &value, Type min, Type max) : ofxSimpleGuiControl(name) {
@@ -26,7 +31,11 @@ public:
 
 		targetValue	= value;
 		oldValue	= targetValue;
+		defaultValue = value; // Store initial value as default
 		controlType = "SliderBase";
+		
+		lastPressTime = 0.0f;
+		lastPressPlace.set(0, 0);
 		
 		setIncrement(0);
 		setSmoothing(0);
@@ -116,7 +125,21 @@ public:
 	}
 
 	void onPress(int x, int y, int button) {
-		updateSlider();
+		// Check for double-click (within 0.25 seconds and small distance)
+		const float DOUBLE_CLICK_TIME = 0.25f;
+		const float MOUSE_DISTANCE = 10.0f;
+		
+		if(ofDistSquared(x, y, lastPressPlace.x, lastPressPlace.y) < MOUSE_DISTANCE * MOUSE_DISTANCE && 
+		   ofGetElapsedTimef() - lastPressTime < DOUBLE_CLICK_TIME) {
+			// Double-click detected - restore default value
+			setValue(defaultValue);
+		} else {
+			// Normal click - update slider
+			updateSlider();
+		}
+		
+		lastPressPlace.set(x, y);
+		lastPressTime = ofGetElapsedTimef();
 	}
 
 	void onDragOver(int x, int y, int button) {
