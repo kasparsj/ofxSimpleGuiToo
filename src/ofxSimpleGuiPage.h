@@ -2,6 +2,9 @@
 
 #include "ofxSimpleGuiIncludes.h"
 
+// Forward declaration
+struct ofxSimpleGuiControlChangeEvent;
+
 class ofxSimpleGuiPage : public ofxSimpleGuiControl {
 public:
 	ofxSimpleGuiPage(string name);
@@ -58,6 +61,9 @@ protected:
 	//some controls can take over focus (e.g. combo box,) which means events should only be passed to them
 	ofxSimpleGuiControl*			eventStealingControl;
 	float getNextY(float y);
+	void onControlChanged(ofxSimpleGuiControlChangeEvent& event);
+	bool isUpdatingSimilarPages; // Flag to prevent recursive updates
+	bool pageNameMatchesPattern; // Cache whether page name matches numbered pattern
 #ifndef OFXMSAGUI_DONT_USE_XML
 	ofxXmlSettings					XML;
 #endif

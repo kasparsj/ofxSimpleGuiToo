@@ -1,15 +1,34 @@
 #include "ofxSimpleGuiPage.h"
+#include "ofxSimpleGuiToo.h"
+#include "Controls/ofxSimpleGuiSliderFloat.h"
+#include "Controls/ofxSimpleGuiSliderInt.h"
+#include "Controls/ofxSimpleGuiToggle.h"
+#include "Controls/ofxSimpleGuiComboBox.h"
+#include <regex>
 
 ofxSimpleGuiPage::ofxSimpleGuiPage(string name) : ofxSimpleGuiControl(name) {
 	disableAllEvents();
 	width = 0;
 	height = ofGetHeight();
 	eventStealingControl = NULL;
+	isUpdatingSimilarPages = false;
 	setXMLName(name + "_settings.xml");
+	
+	// Check if page name matches pattern: baseName + number
+	std::regex pagePattern(R"((.+?)(\d+)$)");
+	pageNameMatchesPattern = std::regex_match(name, pagePattern);
+	
+	// If page name matches pattern, listen to control change events
+	if(pageNameMatchesPattern) {
+		ofAddListener(gui.controlChangedEvent, this, &ofxSimpleGuiPage::onControlChanged);
+	}
 }
 
 ofxSimpleGuiPage::~ofxSimpleGuiPage() {
 	// delete all controls
+	if(pageNameMatchesPattern) {
+		ofRemoveListener(gui.controlChangedEvent, this, &ofxSimpleGuiPage::onControlChanged);
+	}
 }
 
 
@@ -241,11 +260,97 @@ void ofxSimpleGuiPage::mouseMoved(ofMouseEventArgs &e) {
 		for(int i=0; i<controls.size(); i++) controls[i]->_mouseMoved(e);
 }
 
+void ofxSimpleGuiPage::onControlChanged(ofxSimpleGuiControlChangeEvent& event) {
+    // Only process if shift is down and we're not already updating (prevent recursion)
+    if(!ofGetKeyPressed(OF_KEY_SHIFT) || isUpdatingSimilarPages) {
+        return;
+    }
+    
+    // Only process events from this page
+    if(event.pageName != name) {
+        return;
+    }
+    
+    // Extract base name from page name
+    std::regex pagePattern(R"((.+?)(\d+)$)");
+    std::smatch match;
+    if(!std::regex_match(name, match, pagePattern)) {
+        return;
+    }
+    
+    string baseName = match[1].str();
+    vector<ofxSimpleGuiPage*>& allPages = gui.getPages();
+    
+    // Find the source control that triggered the event
+    ofxSimpleGuiControl* sourceControl = nullptr;
+    for(size_t i = 0; i < controls.size(); i++) {
+        if(controls[i]->key == event.controlName) {
+            sourceControl = controls[i];
+            break;
+        }
+    }
+    
+    if(!sourceControl) {
+        return;
+    }
+    
+    // Set flag to prevent recursive updates
+    isUpdatingSimilarPages = true;
+    
+    // Find all pages with the same base name but different numbers
+    for(size_t i = 0; i < allPages.size(); i++) {
+        ofxSimpleGuiPage* otherPage = allPages[i];
+        if(otherPage == this) continue;
+        
+        std::smatch otherMatch;
+        if(std::regex_match(otherPage->name, otherMatch, pagePattern) && 
+           otherMatch[1].str() == baseName) {
+            // Found a matching page, find control with same key
+            vector<ofxSimpleGuiControl*>& otherControls = otherPage->getControls();
+            for(size_t j = 0; j < otherControls.size(); j++) {
+                if(otherControls[j]->key == event.controlName && 
+                   otherControls[j]->controlType == event.controlType) {
+                    // Copy value based on control type
+                    if(event.controlType == "SliderFloat") {
+                        ofxSimpleGuiSliderFloat* src = dynamic_cast<ofxSimpleGuiSliderFloat*>(sourceControl);
+                        ofxSimpleGuiSliderFloat* dst = dynamic_cast<ofxSimpleGuiSliderFloat*>(otherControls[j]);
+                        if(src && dst) {
+                            dst->setValue(src->getValue());
+                        }
+                    } else if(event.controlType == "SliderInt") {
+                        ofxSimpleGuiSliderInt* src = dynamic_cast<ofxSimpleGuiSliderInt*>(sourceControl);
+                        ofxSimpleGuiSliderInt* dst = dynamic_cast<ofxSimpleGuiSliderInt*>(otherControls[j]);
+                        if(src && dst) {
+                            dst->setValue(src->getValue());
+                        }
+                    } else if(event.controlType == "Toggle") {
+                        ofxSimpleGuiToggle* src = dynamic_cast<ofxSimpleGuiToggle*>(sourceControl);
+                        ofxSimpleGuiToggle* dst = dynamic_cast<ofxSimpleGuiToggle*>(otherControls[j]);
+                        if(src && dst) {
+                            dst->setValue(src->getValue());
+                        }
+                    } else if(event.controlType == "ComboBox") {
+                        ofxSimpleGuiComboBox* src = dynamic_cast<ofxSimpleGuiComboBox*>(sourceControl);
+                        ofxSimpleGuiComboBox* dst = dynamic_cast<ofxSimpleGuiComboBox*>(otherControls[j]);
+                        if(src && dst) {
+                            dst->setValue(src->getValue());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Reset flag
+    isUpdatingSimilarPages = false;
+}
+
 void ofxSimpleGuiPage::mousePressed(ofMouseEventArgs &e) {
 	if(eventStealingControl)
 		eventStealingControl->_mousePressed(e);
 	else
-		for(int i=0; i<controls.size(); i++) controls[i]->_mousePressed(e);
+        for(int i=0; i<controls.size(); i++) controls[i]->_mousePressed(e);
 }
 
 void ofxSimpleGuiPage::mouseDragged(ofMouseEventArgs &e) {
@@ -259,7 +364,7 @@ void ofxSimpleGuiPage::mouseReleased(ofMouseEventArgs &e) {
 	if(eventStealingControl)
 		eventStealingControl->_mouseReleased(e);
 	else
-		for(int i=0; i<controls.size(); i++) controls[i]->_mouseReleased(e);
+        for(int i=0; i<controls.size(); i++) controls[i]->_mouseReleased(e);
 }
 
 void ofxSimpleGuiPage::keyPressed(ofKeyEventArgs &e) {
