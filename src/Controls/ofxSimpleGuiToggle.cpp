@@ -38,11 +38,19 @@ bool ofxSimpleGuiToggle::getValue() {
 }
 
 void ofxSimpleGuiToggle::setValue(bool b) {
+	bool oldValue = (*value);
 	(*value) = b;
+	if(oldValue != (*value)) {
+		notifyValueChanged();
+	}
 }
 
 void ofxSimpleGuiToggle::toggle() {
-	(*value) = !(*value); 
+	bool oldValue = (*value);
+	(*value) = !(*value);
+	if(oldValue != (*value)) {
+		notifyValueChanged();
+	}
 }
 
 void ofxSimpleGuiToggle::onPress(int x, int y, int button) {
