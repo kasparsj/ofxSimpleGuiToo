@@ -54,7 +54,7 @@ void ofxSimpleGuiFilePath::draw(float x, float y) {
     ofEnableAlphaBlending();
     ofFill();
     setTextBGColor();
-    ofRect(0, 0, width, height);
+    ofDrawRectangle(0, 0, width, height);
     
     setTextColor();
     ofDrawBitmapString(name, 3, config->sliderHeight);

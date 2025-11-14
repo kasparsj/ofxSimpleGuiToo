@@ -49,7 +49,7 @@ protected:
     //Add a new choice with a specified title.
     //If an invalid index (default = -1) is used then append to the end.
     //If an invalid title is supplied, then the title is set to the index number of the new choice.
-    void addChoice(string title = NULL, int index = -1);
+    void addChoice(string title = "", int index = -1);
     
     void setCBTextColor();
     void setCBTextBGColor();
