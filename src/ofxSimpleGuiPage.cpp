@@ -39,11 +39,14 @@ ofxSimpleGuiPage &ofxSimpleGuiPage::setXMLName(string s) {
 
 
 void ofxSimpleGuiPage::loadFromXML(string xmlFilepath) {
-    string fullPath = xmlFilepath + xmlFilename;
+    string fullPath = xmlFilepath;
+    if (fullPath.size() < 3 || fullPath.substr(fullPath.size()-3) != "xml") {
+        fullPath = xmlFilepath + xmlFilename;
+    }
 	ofLog(OF_LOG_VERBOSE, "ofxSimpleGuiPage::loadFromXML: " + fullPath);
 #ifndef OFXMSAGUI_DONT_USE_XML
-	
-	if(xmlFilename.compare("") == 0) return;
+
+    if(xmlFilename.compare("") == 0) return;
 
 	if(XML.loadFile(fullPath) == false) {
 		ofLog(OF_LOG_ERROR, "Error loading xmlFilename: " + fullPath);
