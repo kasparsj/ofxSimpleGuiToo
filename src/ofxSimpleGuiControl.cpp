@@ -102,3 +102,9 @@ void ofxSimpleGuiControl::notifyValueChanged() {
 	gui.notifyControlChanged(key, controlType, pageName);
 }
 
+void ofxSimpleGuiControl::notifySetTargetValue(void* targetValue) {
+	extern ofxSimpleGuiToo gui;
+	std::string pageName = page ? page->name : "";
+	gui.notifySetTargetValue(key, controlType, pageName, targetValue);
+}
+

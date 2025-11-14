@@ -54,6 +54,14 @@ struct ofxSimpleGuiControlChangeEvent {
     void* newValue;           // Pointer to new value (type-specific)
 };
 
+// Event data structure for setTargetValue events
+struct ofxSimpleGuiSetTargetValueEvent {
+    std::string controlName;  // The key/name of the control
+    std::string controlType;  // Type of control (e.g., "SliderFloat", "ComboBox", etc.)
+    std::string pageName;     // The name of the page this control belongs to
+    void* targetValue;        // Pointer to target value (type-specific)
+};
+
 class ofxSimpleGuiToo {
 	
 public:
@@ -102,9 +110,13 @@ public:
 	
 	// Event system for control changes
 	ofEvent<ofxSimpleGuiControlChangeEvent> controlChangedEvent;
+	ofEvent<ofxSimpleGuiSetTargetValueEvent> setTargetValueEvent;
 	
 	// Notify that a control has changed (called by controls internally)
 	void notifyControlChanged(const std::string& controlName, const std::string& controlType, const std::string& pageName = "", void* oldValue = nullptr, void* newValue = nullptr);
+	
+	// Notify that a control's target value has been set (called by controls internally)
+	void notifySetTargetValue(const std::string& controlName, const std::string& controlType, const std::string& pageName = "", void* targetValue = nullptr);
 	
 	// Register a callback for all control changes
 	// Callback signature: void callback(const std::string& controlName, const std::string& controlType, const std::string& pageName)

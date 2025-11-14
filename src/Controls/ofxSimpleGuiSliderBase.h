@@ -93,6 +93,7 @@ public:
 	
 	void setTargetValue(Type f) {
 		targetValue = ofClamp(f, min, max);
+		notifySetTargetValue(&targetValue);
 	}
 	
 
@@ -119,7 +120,7 @@ public:
 			pct = getMouseX() - x;
 			float temp = ofMap(pct, 0.0, width, min, max, true);
 
-			targetValue = (Type)temp;
+            setTargetValue((Type)temp);
 			oldValue = *value;		// save oldValue (so the draw doesn't update target but uses it)
 		}
 	}
