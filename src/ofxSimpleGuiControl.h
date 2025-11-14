@@ -70,6 +70,10 @@ public:
 	// Notify the gui that this control's value has changed
 	// Should be called by derived classes when their values change
 	void notifyValueChanged();
+	
+	// Notify the gui that this control's target value has been set
+	// Should be called by derived classes when their target values are set
+	void notifySetTargetValue(void* targetValue = nullptr);
 
 protected:
 	ofxSimpleGuiConfig	*config;

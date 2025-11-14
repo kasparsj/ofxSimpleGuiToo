@@ -357,6 +357,17 @@ void ofxSimpleGuiToo::notifyControlChanged(const std::string& controlName, const
     }
 }
 
+void ofxSimpleGuiToo::notifySetTargetValue(const std::string& controlName, const std::string& controlType, const std::string& pageName, void* targetValue) {
+    ofxSimpleGuiSetTargetValueEvent event;
+    event.controlName = controlName;
+    event.controlType = controlType;
+    event.pageName = pageName;
+    event.targetValue = targetValue;
+    
+    // Dispatch the event
+    ofNotifyEvent(setTargetValueEvent, event, this);
+}
+
 void ofxSimpleGuiToo::registerControlChangeCallback(std::function<void(const std::string&, const std::string&, const std::string&)> callback) {
     controlChangeCallback = callback;
 }
