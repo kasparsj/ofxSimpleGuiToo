@@ -45,6 +45,10 @@ void ofxSimpleGuiFilePath::onRelease(int x, int y, int button) {
     focused = false;
 }
 
+void ofxSimpleGuiFilePath::onKeyBackspace() {
+    (*value) = "";
+}
+
 void ofxSimpleGuiFilePath::draw(float x, float y) {
     setPosition(x, y);
     
