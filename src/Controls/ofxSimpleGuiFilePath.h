@@ -16,5 +16,6 @@ public:
     
     void onPress(int x, int y, int button);
     void onRelease(int x, int y, int button);
+    void onKeyBackspace();
     void draw(float x, float y);
 };

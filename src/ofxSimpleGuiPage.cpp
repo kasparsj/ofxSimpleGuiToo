@@ -48,7 +48,7 @@ void ofxSimpleGuiPage::loadFromXML(string xmlFilepath) {
 
     if(xmlFilename.compare("") == 0) return;
 
-	if(XML.loadFile(fullPath) == false) {
+	if(XML.load(fullPath) == false) {
 		ofLog(OF_LOG_ERROR, "Error loading xmlFilename: " + fullPath);
 		return;
 	}
@@ -75,7 +75,7 @@ void ofxSimpleGuiPage::saveToXML(string xmlFilepath) {
 	XML.popTag();
 	
     string fullPath = xmlFilepath + xmlFilename;
-	XML.saveFile(fullPath);
+	XML.save(fullPath);
 	//	if(doSaveBackup) 
 	ofLog(OF_LOG_VERBOSE, "ofxSimpleGuiPage::saveToXML: " + fullPath + " " + ofToString(controls.size(), 0) + " items");
 #endif    
