@@ -368,6 +368,14 @@ void ofxSimpleGuiToo::notifySetTargetValue(const std::string& controlName, const
     ofNotifyEvent(setTargetValueEvent, event, this);
 }
 
+void ofxSimpleGuiToo::notifyPageLoaded(const std::string& pageName, const std::string& xmlFilepath) {
+    ofxSimpleGuiPageLoadEvent event;
+    event.pageName = pageName;
+    event.xmlFilepath = xmlFilepath;
+
+    ofNotifyEvent(pageLoadEvent, event, this);
+}
+
 void ofxSimpleGuiToo::registerControlChangeCallback(std::function<void(const std::string&, const std::string&, const std::string&)> callback) {
     controlChangeCallback = callback;
 }

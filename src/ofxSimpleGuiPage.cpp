@@ -58,6 +58,8 @@ void ofxSimpleGuiPage::loadFromXML(string xmlFilepath) {
 		controls[i]->loadFromXML(XML);
 	}
 	XML.popTag();
+	
+    gui.notifyPageLoaded(name, fullPath);
 #endif    
 }
 

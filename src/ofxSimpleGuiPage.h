@@ -2,8 +2,9 @@
 
 #include "ofxSimpleGuiIncludes.h"
 
-// Forward declaration
+// Forward declarations
 struct ofxSimpleGuiControlChangeEvent;
+struct ofxSimpleGuiPageLoadEvent;
 
 class ofxSimpleGuiPage : public ofxSimpleGuiControl {
 public:

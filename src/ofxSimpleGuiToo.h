@@ -62,6 +62,12 @@ struct ofxSimpleGuiSetTargetValueEvent {
     void* targetValue;        // Pointer to target value (type-specific)
 };
 
+// Event data structure for page load events
+struct ofxSimpleGuiPageLoadEvent {
+    std::string pageName;     // The name of the page that was loaded
+    std::string xmlFilepath;  // The file path that was loaded
+};
+
 class ofxSimpleGuiToo {
 	
 public:
@@ -111,12 +117,15 @@ public:
 	// Event system for control changes
 	ofEvent<ofxSimpleGuiControlChangeEvent> controlChangedEvent;
 	ofEvent<ofxSimpleGuiSetTargetValueEvent> setTargetValueEvent;
+    ofEvent<ofxSimpleGuiPageLoadEvent> pageLoadEvent;
 	
 	// Notify that a control has changed (called by controls internally)
 	void notifyControlChanged(const std::string& controlName, const std::string& controlType, const std::string& pageName = "", void* oldValue = nullptr, void* newValue = nullptr);
 	
 	// Notify that a control's target value has been set (called by controls internally)
 	void notifySetTargetValue(const std::string& controlName, const std::string& controlType, const std::string& pageName = "", void* targetValue = nullptr);
+
+    void notifyPageLoaded(const std::string& pageName = "", const std::string& xmlFilepath = "");
 	
 	// Register a callback for all control changes
 	// Callback signature: void callback(const std::string& controlName, const std::string& controlType, const std::string& pageName)
