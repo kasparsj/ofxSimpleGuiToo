@@ -69,7 +69,7 @@ public:
 	
 	// Notify the gui that this control's value has changed
 	// Should be called by derived classes when their values change
-	void notifyValueChanged();
+	void notifyValueChanged(void* oldValue = nullptr);
 	
 	// Notify the gui that this control's target value has been set
 	// Should be called by derived classes when their target values are set

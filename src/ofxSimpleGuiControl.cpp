@@ -96,10 +96,10 @@ ofxSimpleGuiControl &ofxSimpleGuiControl::setKeyboardShortcut(char c) {
 	return *this;
 }
 
-void ofxSimpleGuiControl::notifyValueChanged() {
+void ofxSimpleGuiControl::notifyValueChanged(void* oldValue) {
 	extern ofxSimpleGuiToo gui;
 	std::string pageName = page ? page->name : "";
-	gui.notifyControlChanged(key, controlType, pageName);
+	gui.notifyControlChanged(key, controlType, pageName, oldValue);
 }
 
 void ofxSimpleGuiControl::notifySetTargetValue(void* targetValue) {

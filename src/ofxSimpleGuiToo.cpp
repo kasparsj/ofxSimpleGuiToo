@@ -1,4 +1,10 @@
 #include "ofxSimpleGuiToo.h"
+#include <fstream>
+#include <iterator>
+#include "Controls/ofxSimpleGuiSliderFloat.h"
+#include "Controls/ofxSimpleGuiSliderInt.h"
+#include "Controls/ofxSimpleGuiToggle.h"
+#include "Controls/ofxSimpleGuiColorPicker.h"
 
 ofxSimpleGuiToo gui;
 
@@ -341,6 +347,27 @@ ofxSimpleGuiFileComboBox &ofxSimpleGuiToo::addFileComboBox(string name, string &
 }
 
 void ofxSimpleGuiToo::notifyControlChanged(const std::string& controlName, const std::string& controlType, const std::string& pageName, void* oldValue, void* newValue) {
+    // Save undo state with the old value before change
+    if (doUndo && !isUndoing && oldValue != nullptr) {
+        // Convert oldValue pointer to string representation based on control type
+        string previousValue;
+        if (controlType == "SliderFloat") {
+            previousValue = ofToString(*(float*)oldValue);
+        } else if (controlType == "SliderInt") {
+            previousValue = ofToString(*(int*)oldValue);
+        } else if (controlType == "Toggle") {
+            previousValue = ofToString(*(bool*)oldValue);
+        } else if (controlType == "ColorPicker") {
+            ofFloatColor* color = (ofFloatColor*)oldValue;
+            previousValue = ofToString(color->r) + "," + ofToString(color->g) + "," + ofToString(color->b) + "," + ofToString(color->a);
+        } else {
+            // Default: for other control types, skip undo saving
+            return;
+        }
+        
+        scheduleUndoSave(pageName, controlName, controlType, previousValue);
+    }
+    
     ofxSimpleGuiControlChangeEvent event;
     event.controlName = controlName;
     event.controlType = controlType;
@@ -350,11 +377,6 @@ void ofxSimpleGuiToo::notifyControlChanged(const std::string& controlName, const
     
     // Dispatch the event
     ofNotifyEvent(controlChangedEvent, event, this);
-    
-    // Call registered callback if any
-    if (controlChangeCallback) {
-        controlChangeCallback(controlName, controlType, pageName);
-    }
 }
 
 void ofxSimpleGuiToo::notifySetTargetValue(const std::string& controlName, const std::string& controlType, const std::string& pageName, void* targetValue) {
@@ -374,10 +396,6 @@ void ofxSimpleGuiToo::notifyPageLoaded(const std::string& pageName, const std::s
     event.xmlFilepath = xmlFilepath;
 
     ofNotifyEvent(pageLoadEvent, event, this);
-}
-
-void ofxSimpleGuiToo::registerControlChangeCallback(std::function<void(const std::string&, const std::string&, const std::string&)> callback) {
-    controlChangeCallback = callback;
 }
 
 //void ofxSimpleGuiToo::setup(ofEventArgs &e) {
@@ -452,9 +470,9 @@ void ofxSimpleGuiToo::mouseReleased(ofMouseEventArgs &e) {
 }
 
 void ofxSimpleGuiToo::keyPressed(ofKeyEventArgs &e) {
+    int key = e.keycode;
     //    if(doDefaultKeys && e.hasModifier(OF_KEY_CONTROL) && e.hasModifier(OF_KEY_ALT)) {
     if(doDefaultKeys && e.hasModifier(OF_KEY_CONTROL)) {
-        int key = e.keycode;
         if(key == ' ') {
             toggleDraw();
         } else if(key>='0' && key<='9') {
@@ -467,6 +485,9 @@ void ofxSimpleGuiToo::keyPressed(ofKeyEventArgs &e) {
             }
         }
     }
+    else if(doUndo && e.hasModifier(OF_KEY_COMMAND) && (key == 'z' || key == 'Z')) {
+        performUndo();
+    }
 
     if(doDraw) {
         headerPage->keyPressed(e);
@@ -478,6 +499,84 @@ void ofxSimpleGuiToo::keyPressed(ofKeyEventArgs &e) {
 void ofxSimpleGuiToo::keyReleased(ofKeyEventArgs &e) {
     headerPage->keyReleased(e);
     pages[currentPageIndex]->keyReleased(e);
+}
+
+void ofxSimpleGuiToo::scheduleUndoSave(const std::string& pageName, const std::string& controlName, const std::string& controlType, const std::string& previousValue) {
+    float currentTime = ofGetElapsedTimeMillis();
+    
+    // Check if enough time has passed since last save (debounce)
+    if (currentTime - lastUndoSaveTime >= undoDebounceDelay) {
+        saveUndoState(pageName, controlName, controlType, previousValue);
+        lastUndoSaveTime = currentTime;
+    }
+}
+
+void ofxSimpleGuiToo::saveUndoState(const std::string& pageName, const std::string& controlName, const std::string& controlType, const std::string& previousValue) {
+    if (isUndoing) return;
+    
+    UndoState undoState;
+    undoState.pageName = pageName;
+    undoState.controlName = controlName;
+    undoState.controlType = controlType;
+    undoState.previousValue = previousValue;
+    undoState.timestamp = ofGetElapsedTimeMillis();
+    
+    undoStates.push_back(undoState);
+    
+    if (undoStates.size() > maxUndoStates) {
+        undoStates.erase(undoStates.begin());
+    }
+}
+
+void ofxSimpleGuiToo::performUndo() {
+    if (undoStates.empty()) return;
+    
+    isUndoing = true;
+    
+    UndoState lastState = undoStates.back();
+    undoStates.pop_back();
+    
+    try {
+        ofxSimpleGuiControl& ctrl = control(lastState.controlName);
+        
+        // Restore value based on control type using dynamic casting
+        if (lastState.controlType == "SliderFloat") {
+            auto* slider = dynamic_cast<ofxSimpleGuiSliderFloat*>(&ctrl);
+            if (slider) {
+                float value = ofToFloat(lastState.previousValue);
+                slider->setValue(value);
+            }
+        } else if (lastState.controlType == "SliderInt") {
+            auto* slider = dynamic_cast<ofxSimpleGuiSliderInt*>(&ctrl);
+            if (slider) {
+                int value = ofToInt(lastState.previousValue);
+                slider->setValue(value);
+            }
+        } else if (lastState.controlType == "Toggle") {
+            auto* toggle = dynamic_cast<ofxSimpleGuiToggle*>(&ctrl);
+            if (toggle) {
+                bool value = ofToBool(lastState.previousValue);
+                toggle->setValue(value);
+            }
+        } else if (lastState.controlType == "ColorPicker") {
+            auto* colorPicker = dynamic_cast<ofxSimpleGuiColorPicker*>(&ctrl);
+            if (colorPicker) {
+                // Parse comma-separated RGBA values
+                vector<string> components = ofSplitString(lastState.previousValue, ",");
+                if (components.size() >= 4) {
+                    colorPicker->setValue(ofToFloat(components[0]), 0); // r
+                    colorPicker->setValue(ofToFloat(components[1]), 1); // g
+                    colorPicker->setValue(ofToFloat(components[2]), 2); // b
+                    colorPicker->setValue(ofToFloat(components[3]), 3); // a
+                }
+            }
+        }
+        
+    } catch (...) {
+        // Control not found, skip restore
+    }
+    
+    isUndoing = false;
 }
 
 /*

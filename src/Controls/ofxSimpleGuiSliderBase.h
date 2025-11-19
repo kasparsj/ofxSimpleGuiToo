@@ -185,7 +185,7 @@ public:
 		
 		// Notify if value changed
 		if(previousValue != *value) {
-			notifyValueChanged();
+			notifyValueChanged(&previousValue);
 		}
 		
 		if(lock) {

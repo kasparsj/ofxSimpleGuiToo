@@ -115,7 +115,7 @@ void ofxSimpleGuiComboBox::setValue(int index) {
     int oldValue = m_selectedChoice;
     m_selectedChoice = ofClamp(index, m_includeBlank ? -1 : 0, m_choices.size());
     if(oldValue != m_selectedChoice) {
-        notifyValueChanged();
+        notifyValueChanged(&oldValue);
     }
 }
 
@@ -202,7 +202,7 @@ void ofxSimpleGuiComboBox::releaseEventStealingFocus(){
     
     // Notify if value changed
     if(oldValue != m_selectedChoice) {
-        notifyValueChanged();
+        notifyValueChanged(&oldValue);
     }
 	
 	//a release toggles focus state if we are on - TODO: unless x and y don't change

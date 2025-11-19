@@ -41,7 +41,7 @@ void ofxSimpleGuiToggle::setValue(bool b) {
 	bool oldValue = (*value);
 	(*value) = b;
 	if(oldValue != (*value)) {
-		notifyValueChanged();
+		notifyValueChanged(&oldValue);
 	}
 }
 
@@ -49,7 +49,7 @@ void ofxSimpleGuiToggle::toggle() {
 	bool oldValue = (*value);
 	(*value) = !(*value);
 	if(oldValue != (*value)) {
-		notifyValueChanged();
+		notifyValueChanged(&oldValue);
 	}
 }
 

@@ -167,12 +167,29 @@ protected:
 	
 	bool							doDraw = true;
 	float							border;
+    bool                            doUndo = true;
 	
 	ofxSimpleGuiPage				*headerPage;
 	ofxSimpleGuiButton				*titleButton;
 	vector <ofxSimpleGuiPage*>		pages;				// 0 is for headerPage
 	
-	std::function<void(const std::string&, const std::string&, const std::string&)> controlChangeCallback;
+	struct UndoState {
+		string pageName;
+		string controlName;
+		string controlType;
+		string previousValue;
+		float timestamp;
+	};
+	
+	vector<UndoState> undoStates;
+	int maxUndoStates = 50;
+	bool isUndoing = false;
+	float lastUndoSaveTime = 0;
+	float undoDebounceDelay = 1000; // 1 second in milliseconds
+	
+	void scheduleUndoSave(const std::string& pageName, const std::string& controlName, const std::string& controlType, const std::string& previousValue);
+	void saveUndoState(const std::string& pageName, const std::string& controlName, const std::string& controlType, const std::string& previousValue);
+	void performUndo();
 	
 	void addListeners();
 	void removeListeners();
